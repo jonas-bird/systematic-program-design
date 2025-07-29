@@ -179,12 +179,11 @@
 ;(define (render-lom lom im) im) ;stub
 
 (define (render-lom lom im)
-  (place-images (make-list (length lom) MISSILE) (map missile->posn lom) im))
+  (place-images
+   (make-list (length lom) MISSILE)
+   (map (lambda (m) (make-posn (missile-x m) (missile-y m))) lom)
+   im))
 
-;; Missile -> Posn
-;; make a list of missiles a list of posn
-(define (missile->posn m)
-  (make-posn (missile-x m) (missile-y m)))
 
 ;; Tank Image -> Image 
 ;; adds t to the given image im
