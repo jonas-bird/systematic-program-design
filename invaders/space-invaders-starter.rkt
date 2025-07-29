@@ -130,13 +130,25 @@
 ;; !!!
 (define (tock ws) ...)
 
-;; WS -> Image
-;; render ...
-;; !!!
+;; Game -> Image
+;; render game
+(check-expect
+ (render-game (make-game empty empty T0))
+ (render-tank T0 BACKGROUND))
+(check-expect
+ (render-game G3)
+ (render-loinvader (list I1 I2)
+                   (render-lom (list M1 M2)
+                               (render-tank T1
+                                            BACKGROUND))))
+
+
 (define (render-game s)
-  (... (render-loinvader (game-invaders s))
-       (render-lom (game-missiles s))
-       (render-tank (game-tank s) BACKGROUND)))
+  (render-loinvader
+   (game-invaders s)
+   (render-lom
+    (game-missiles s)
+    (render-tank (game-tank s) BACKGROUND))))
 
 ;; List-of-invaders Image -> Image
 ;; render the list of UFOs
@@ -155,7 +167,7 @@
 ;(define (render-loinvader loi im) im) ;stub
 
 (define (render-loinvader loi im)
-  (cond [(empty? loi) BACKGROUND]
+  (cond [(empty? loi) im]
         [else
          (place-image INVADER
                       (invader-x (first loi))
@@ -179,10 +191,12 @@
 ;(define (render-lom lom im) im) ;stub
 
 (define (render-lom lom im)
-  (place-images
-   (make-list (length lom) MISSILE)
-   (map (lambda (m) (make-posn (missile-x m) (missile-y m))) lom)
-   im))
+  (cond [(empty? lom) im]
+        [else
+         (place-images
+          (make-list (length lom) MISSILE)
+          (map (lambda (m) (make-posn (missile-x m) (missile-y m))) lom)
+          im)]))
 
 
 ;; Tank Image -> Image 
