@@ -137,11 +137,14 @@
  (render-tank T0 BACKGROUND))
 (check-expect
  (render-game G3)
- (render-loinvader (list I1 I2)
-                   (render-lom (list M1 M2)
-                               (render-tank T1
-                                            BACKGROUND))))
-
+ (place-images
+  (list INVADER INVADER)
+  (list (make-posn (invader-x I1) (invader-y I1))
+        (make-posn (invader-x I2) (invader-y I2)))
+  (place-images (make-list 2 MISSILE)
+                (list (make-posn 150 300)
+                      (make-posn (invader-x I1) (+ (invader-y I1) 10)))
+                (place-image TANK 50  (- HEIGHT  TANK-HEIGHT/2) BACKGROUND))))
 
 (define (render-game s)
   (render-loinvader
@@ -172,7 +175,7 @@
          (place-image INVADER
                       (invader-x (first loi))
                       (invader-y (first loi))
-                      (render-loinvader (rest loi) BACKGROUND))]))
+                      (render-loinvader (rest loi) im))]))
 
 ;; List-of-missiles Image -> Image
 ;; render the list of Missiles
