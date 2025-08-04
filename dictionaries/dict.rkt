@@ -45,11 +45,22 @@
 ;; 196
 ;; [List-of String] -> [List-of Number]
 ;; count how often each letter is used as the first one of a word in a given dictionary
-(check-expect (count-by-letter TEST-LIST) (list 261 195 384 213 192 181 125 131 140 24 31 135 164 77 93 318 15 209 458 225 81 38 136 0 14  2))
-(check-expect (count-by-letter (list "a" "b" "c" "d" "e" "f" "g" "h")) (list 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
+(check-expect (count-by-letter TEST-LIST)
+              (list '("a" 261) '("b" 195) '("c" 384)
+                    '("d" 213) '("e" 192) '("f" 181)
+                    '("g" 125) '("h" 131) '("i" 140)
+                    '("j" 24)  '("k" 31)  '("l" 135)
+                    '("m" 164) '("n" 77)  '("o" 93)
+                    '("p" 318) '("q" 15)  '("r" 209)
+                    '("s" 458) '("t" 225) '("u" 81)
+                    '("v" 38)  '("w" 136) '("x" 0)
+                    '("y" 14)  '("z" 2)))
+(check-expect (count-by-letter (list "a" "b" "c" "d" "e" "f" "g" "h")) (list '("a" 1) '("b" 1) '("c" 1) '("d" 1) '("e" 1) '("f" 1) '("g" 1) '("h" 1) '("i" 0) '("j" 0) '("k" 0) '("l" 0) '("m" 0) '("n" 0) '("o" 0) '("p" 0) '("q" 0) '("r" 0) '("s" 0) '("t" 0) '("u" 0) '("v" 0) '("w" 0) '("x" 0) '("y" 0) '("z" 0)))
 ;(define (count-by-letter los) '()) ;stub
 
 (define (count-by-letter los)
    (for/list ([c LETTERS])
      (starts-with# c los)))
 
+;; 197
+;; [List-of String] -? Number 
