@@ -2,7 +2,7 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname dict) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
 (require 2htdp/batch-io)
-(require 2htdp/abstraction)
+
 ; On OS X: 
 (define LOCATION "/usr/share/dict/words")
 ; On LINUX: /usr/share/dict/words or /var/lib/dict/words
@@ -22,6 +22,12 @@
 ;; test data
 (define TEST-LOC "small-dict.txt")
 (define TEST-LIST (read-lines TEST-LOC))
+
+
+(define-struct letter-count [letter count])
+; A Letter-Count is (make-letter-count Letter Natural)
+; interp. (make-letter-count etterl count) indicates that letter appears count times
+(make-letter-count "A" 5)
 
 ;;; exercise 195: design a function starts-with# to answer how many words in a dictionary
 ;;;               start with a given letter
@@ -43,24 +49,91 @@
 (define ex195b (starts-with# "z" TEST-LIST)) ;146
 
 ;; 196
-;; [List-of String] -> [List-of Number]
+;; [List-of String] -> [List-of (list String Number)]
 ;; count how often each letter is used as the first one of a word in a given dictionary
-(check-expect (count-by-letter TEST-LIST)
-              (list '("a" 261) '("b" 195) '("c" 384)
-                    '("d" 213) '("e" 192) '("f" 181)
-                    '("g" 125) '("h" 131) '("i" 140)
-                    '("j" 24)  '("k" 31)  '("l" 135)
-                    '("m" 164) '("n" 77)  '("o" 93)
-                    '("p" 318) '("q" 15)  '("r" 209)
-                    '("s" 458) '("t" 225) '("u" 81)
-                    '("v" 38)  '("w" 136) '("x" 0)
-                    '("y" 14)  '("z" 2)))
-(check-expect (count-by-letter (list "a" "b" "c" "d" "e" "f" "g" "h")) (list '("a" 1) '("b" 1) '("c" 1) '("d" 1) '("e" 1) '("f" 1) '("g" 1) '("h" 1) '("i" 0) '("j" 0) '("k" 0) '("l" 0) '("m" 0) '("n" 0) '("o" 0) '("p" 0) '("q" 0) '("r" 0) '("s" 0) '("t" 0) '("u" 0) '("v" 0) '("w" 0) '("x" 0) '("y" 0) '("z" 0)))
+(check-expect (count-by-letter '() TEST-LIST) '())
+(check-expect (count-by-letter LETTERS '()) (list
+                                             (make-letter-count "a" 0)
+                                             (make-letter-count "b" 0)
+                                             (make-letter-count "c" 0)
+                                             (make-letter-count "d" 0)
+                                             (make-letter-count "e" 0)
+                                             (make-letter-count "f" 0)
+                                             (make-letter-count "g" 0)
+                                             (make-letter-count "h" 0)
+                                             (make-letter-count "i" 0)
+                                             (make-letter-count "j" 0)
+                                             (make-letter-count "k" 0)
+                                             (make-letter-count "l" 0)
+                                             (make-letter-count "m" 0)
+                                             (make-letter-count "n" 0)
+                                             (make-letter-count "o" 0)
+                                             (make-letter-count "p" 0)
+                                             (make-letter-count "q" 0)
+                                             (make-letter-count "r" 0)
+                                             (make-letter-count "s" 0)
+                                             (make-letter-count "t" 0)
+                                             (make-letter-count "u" 0)
+                                             (make-letter-count "v" 0)
+                                             (make-letter-count "w" 0)
+                                             (make-letter-count "x" 0)
+                                             (make-letter-count "y" 0)
+                                             (make-letter-count "z" 0)))
+(check-expect (count-by-letter LETTERS TEST-LIST)
+              (list (make-letter-count "a" 261)
+                    (make-letter-count "b" 195)
+                    (make-letter-count "c" 384)
+                    (make-letter-count "d" 213)
+                    (make-letter-count "e" 192)
+                    (make-letter-count "f" 181)
+                    (make-letter-count "g" 125)
+                    (make-letter-count "h" 131)
+                    (make-letter-count "i" 140)
+                    (make-letter-count "j" 24)
+                    (make-letter-count "k" 31)
+                    (make-letter-count "l" 135)
+                    (make-letter-count "m" 164)
+                    (make-letter-count "n" 77)
+                    (make-letter-count "o" 93)
+                    (make-letter-count "p" 318)
+                    (make-letter-count "q" 15)
+                    (make-letter-count "r" 209)
+                    (make-letter-count "s" 458)
+                    (make-letter-count "t" 225)
+                    (make-letter-count "u" 81)
+                    (make-letter-count "v" 38)
+                    (make-letter-count "w" 136)
+                    (make-letter-count "x" 0)
+                    (make-letter-count "y" 14)
+                    (make-letter-count "z" 2)))
+(check-expect
+ (count-by-letter
+  LETTERS (list "a" "b" "c" "c" "d" "e" "f" "g" "h"))
+ (list (make-letter-count "a" 1) (make-letter-count "b" 1)
+       (make-letter-count "c" 2) (make-letter-count "d" 1)
+       (make-letter-count "e" 1) (make-letter-count "f" 1)
+       (make-letter-count "g" 1) (make-letter-count "h" 1)
+       (make-letter-count "i" 0) (make-letter-count "j" 0)
+       (make-letter-count "k" 0) (make-letter-count "l" 0)
+       (make-letter-count "m" 0) (make-letter-count "n" 0)
+       (make-letter-count "o" 0) (make-letter-count "p" 0)
+       (make-letter-count "q" 0) (make-letter-count "r" 0)
+       (make-letter-count "s" 0) (make-letter-count "t" 0)
+       (make-letter-count "u" 0) (make-letter-count "v" 0)
+       (make-letter-count "w" 0) (make-letter-count "x" 0)
+       (make-letter-count "y" 0) (make-letter-count "z" 0)))
+
 ;(define (count-by-letter los) '()) ;stub
 
-(define (count-by-letter los)
-   (for/list ([c LETTERS])
-     (starts-with# c los)))
+(define (count-by-letter lolet dict)
+  (cond [(empty? lolet) '()]
+        [else
+         (cons
+          (make-letter-count (first lolet)
+                             (starts-with# (first lolet) dict))
+               (count-by-letter (rest lolet) dict))]))
 
-;; 197
-;; [List-of String] -? Number 
+;; 197 this exercise includes multiple different designs of the same function
+;; Dictionary -> Letter-Count
+;; return the Letter-Count for the most frequently (highest value in count)
+(define (most-frequentv1 d) (make-letter-count "A" 0)) ;stub
