@@ -1,3 +1,4 @@
+#lang htdp/bsl
 (require 2htdp/abstraction)
 
 ;;; 345
@@ -52,3 +53,40 @@
     [(? number?) e]
     [(add x y) (+ (eval-expression x) (eval-expression y))]
     [(mul x y) (* (eval-expression x) (eval-expression y))]))
+
+;; 348 now we add in Boolean
+
+;; boolval is one of:
+;; - #true
+;; - #false
+
+(define-struct myAND (left right))
+(define-struct myOR (left right))
+(define-struct myNOT (clause))
+;; NOTE: I am not sure if I like this as a final definition, maybe and/or should be able to handle more than 2 arguments?
+;; boolexp is one of:
+;; - boolval
+;; - (make-myAND [boolexp boolexp])
+;; - (make-myOR [boolexp boolexp])
+;; - (make-myNOT [bookexp])
+
+;; boolexp -> Boolean
+;; eval-bool-expression evaluates a boolean expression to a boolean value
+(check-expect (eval-bool-expression #true) #true)
+(check-expect (eval-bool-expression (make-myNOT #true)) #false)
+(check-expect (eval-bool-expression (make-myAND #false #false)) #false)
+(check-expect (eval-bool-expression (make-myAND #true #false)) #false)
+(check-expect (eval-bool-expression (make-myAND #true #true)) #true)
+(check-expect (eval-bool-expression (make-myAND (make-myNOT #false) #false)) #false)
+(check-expect (eval-bool-expression (make-myOR #false #true)) #true)
+(check-expect (eval-bool-expression (make-myOR #false #false)) #false)
+(check-expect (eval-bool-expression (make-myOR (make-myAND #true #true)
+                                               (make-myNOT (make-myOR #false #true)))) #true)
+(check-expect (eval-bool-expression #true) #true)
+;(define (eval-bool-expression b) #false) ;stub
+(define (eval-bool-expression b)
+    (match b
+      ((? boolean?) b)
+      ((myAND x y) (and (eval-bool-expression x) (eval-bool-expression y)))
+      ((myOR x y) (or (eval-bool-expression x) (eval-bool-expression y)))
+      ((myNOT x) (not (eval-bool-expression x)))))
