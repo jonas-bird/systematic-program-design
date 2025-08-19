@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-advanced-reader.ss" "lang")((modname dict) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname dict) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
 (require 2htdp/batch-io)
 
 ; On OS X: 
@@ -22,7 +22,7 @@
 ;; test data
 (define TEST-LOC "small-dict.txt")
 (define TEST-LIST (read-lines TEST-LOC))
-
+(define TEST-SMALL (list "apple" "argument" "bat" "cat" "orange" "zebra"))
 
 (define-struct letter-count [letter count])
 ; A Letter-Count is (make-letter-count Letter Natural)
@@ -49,7 +49,7 @@
 (define ex195b (starts-with# "z" TEST-LIST)) ;146
 
 ;; 196
-;; [List-of String] -> [List-of (list String Number)]
+;; [List-of String] -> [List-of Letter-Count]
 ;; count how often each letter is used as the first one of a word in a given dictionary
 (check-expect (count-by-letter '() TEST-LIST) '())
 (check-expect (count-by-letter LETTERS '()) (list
@@ -131,9 +131,47 @@
          (cons
           (make-letter-count (first lolet)
                              (starts-with# (first lolet) dict))
-               (count-by-letter (rest lolet) dict))]))
+          (count-by-letter (rest lolet) dict))]))
 
 ;; 197 this exercise includes multiple different designs of the same function
+
+;; how to handle ties?
+
 ;; Dictionary -> Letter-Count
 ;; return the Letter-Count for the most frequently (highest value in count)
-(define (most-frequentv1 d) (make-letter-count "A" 0)) ;stub
+(check-expect (most-frequentv1 TEST-SMALL) (make-letter-count "a" 2))
+(check-expect (most-frequentv2 TEST-SMALL) (make-letter-count "a" 2))
+(check-expect (most-frequentv1 TEST-LIST) (make-letter-count "s" 458))
+(check-expect (most-frequentv2 TEST-LIST) (make-letter-count "s" 458))
+;(define (most-frequentv1 d) (make-letter-count "a" 0)) ;stub
+;(define (most-frequentv2 d) (make-letter-count "a" 0)) ;stub
+(define (most-frequentv1 d)
+  (local [(define c (count-by-letter LETTERS d))
+          (define (insert lc llc)
+            (cond [(empty? llc) (list lc)]
+                  [else
+                   (if (> (letter-count-count lc)
+                          (letter-count-count (first llc)))
+                       (cons lc llc)
+                       (cons (first llc) (insert lc (rest llc))))]))
+          (define (sorted>llc llc)
+            (cond
+              [(empty? llc) '()]
+              [else (insert (first llc) (sorted>llc (rest llc)))]))]
+    (first (sorted>llc c))))
+
+(define (most-frequentv2 d)
+  (local [(define c (count-by-letter LETTERS d))
+          (define (process llc) 
+            (cond [(empty? (rest llc)) (first llc)]
+                  [else  (if (> (letter-count-count (first llc))
+                                (letter-count-count (first (rest llc))))
+                             (process (cons (first llc)
+                                            (rest (rest llc))))
+                             (process (rest llc)))]))]
+    (process c)))
+
+
+
+
+
